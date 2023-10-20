@@ -1,8 +1,11 @@
 /* eslint-disable react/prop-types */
 const Total = ({ parts }) => {
+  const totalExercises = parts.reduce((totalExercises, part) => totalExercises + part.exercises, 0);
   return (
     <p>
-      Number of exercises {parts.reduce((totalExercises, part) => totalExercises + part.exercises, 0)}
+      <b>
+        Number of exercises: {totalExercises}
+      </b>
     </p>
   )
 }
