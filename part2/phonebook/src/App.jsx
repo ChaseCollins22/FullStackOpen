@@ -11,13 +11,6 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [personsDisplay, setPersonsDisplay] = useState(persons);
 
-  const createNewPersonObj = () => {
-    return {
-      name: newName,
-      number: newNumber
-    }
-  }
-
   const handleSearch = (event) => {
     setPersonsDisplay(persons.filter((personObj) => {
       const personName = personObj.name.toLowerCase()
@@ -26,7 +19,18 @@ const App = () => {
     })
   )}
 
-  const onFormSubmit = (event) => {
+  const personExists = (newPersonObj) => {
+    return persons.some(personObj => JSON.stringify(personObj) === JSON.stringify(newPersonObj))
+  }
+
+  const createNewPersonObj = () => {
+    return {
+      name: newName,
+      number: newNumber
+    }
+  }
+
+  const handleFormSubmit = (event) => {
     event.preventDefault();
     const newPersonObj = createNewPersonObj();
     
@@ -39,10 +43,6 @@ const App = () => {
     }
   }
 
-  const personExists = (newPersonObj) => {
-    return persons.some(personObj => JSON.stringify(personObj) === JSON.stringify(newPersonObj))
-  }
-
   const handleNewName = (event) => setNewName(event.target.value)
 
   const handleNewNumber = (event) => setNewNumber(event.target.value);
@@ -50,19 +50,15 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      Search <input type="text" onChange={handleSearch} />
+      <Search onSearchChange={handleSearch}/>
       <h2>Add a new</h2>
-      <form onSubmit={onFormSubmit}>
-        <div>
-          Name: <input onChange={handleNewName} value={newName} required/>
-        </div>
-        <div>
-          Number: <input onChange={handleNewNumber} value={newNumber} required/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm 
+        onFormSubmit={handleFormSubmit}
+        handleNewName={handleNewName}
+        newName={newName}
+        handleNewNumber={handleNewNumber}
+        newNumber={newNumber}
+      />
       <h2>Numbers</h2>
       <PersonsList personsList={personsDisplay} />
     </div>
@@ -80,6 +76,32 @@ const PersonsList = ({ personsList }) => {
        name={person.name}
        number={person.number}
    />)
+}
+
+const PersonForm = ({ onFormSubmit, handleNewName, newName, handleNewNumber, newNumber }) => {
+  return (
+    <form onSubmit={onFormSubmit}>
+      <FormField formLabel={'Name'} handleInputChange={handleNewName} value={newName}/>
+      <FormField formLabel={'Number:'} handleInputChange={handleNewNumber} value={newNumber}/>
+      <button type="submit">add</button>
+    </form>
+  )
+}
+
+const FormField = ({ formLabel, handleInputChange, value }) => {
+  return (
+    <div>
+      {formLabel} <input onChange={handleInputChange} value={value} required/>
+    </div>
+  )
+}
+
+const Search = ({onSearchChange}) => {
+  return (
+    <>
+      {'Search'}<input type="text" onChange={onSearchChange} />
+    </>
+  )
 }
 
 export default App
