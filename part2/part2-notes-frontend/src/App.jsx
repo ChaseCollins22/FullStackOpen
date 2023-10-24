@@ -13,16 +13,64 @@ const App = () => {
       .then(response => {
         setNotes(response.data)
       })
-  }, [])
+  }, []);
+
+  const addNote = (event) => {
+    event.preventDefault()
+    const noteObject = {
+      content: newNote,
+      important: Math.random() < 0.5,
+    }
+  
+    axios
+      .post('http://localhost:3001/notes', noteObject)
+      .then(response => {
+        setNotes([...notes, response.data])
+        setNewNote('')
+      })
+  }
+
+  const handleNoteChange = (event) => {
+    setNewNote(event.target.value)
+  }
+
+  const toggleImportanceOf = (id) => {
+    const url = `http://localhost:3001/notes/${id}`;
+    const note = notes.find((note) => note.id === id)
+    const modifiedNote = { ...note, important: !note.important }
+
+    axios
+      .put(url, modifiedNote)
+      .then(response => {
+        console.log(response)
+        setNotes(notes.map(note => note.id !== id ? note : response.data))
+      });
+  }
+
+  const notesToShow = showAll
+    ? notes
+    : notes.filter(note => note.important)
 
   return (
     <div>
       <h1>Notes</h1>
+      <div>
+        <button onClick={() => setShowAll(!showAll)}>
+          show {showAll ? 'important' : 'all' }
+        </button>
+      </div>      
       <ul>
-        {notes.map(note => 
-          <Note key={note.id} note={note} />
+        {notesToShow.map(note => 
+          <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)}/>
         )}
       </ul>
+      <form onSubmit={addNote}>
+      <input
+          value={newNote}
+          onChange={handleNoteChange}
+        />
+        <button type="submit">save</button>
+      </form> 
     </div>
   )
 }
