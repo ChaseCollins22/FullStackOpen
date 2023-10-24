@@ -1,22 +1,46 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import people from './services/people'
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [personsDisplay, setPersonsDisplay] = useState(persons);
+  const [showAllPeople, setShowAllPeople] = useState(true);
+
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-        setPersonsDisplay(response.data)
+    people
+      .getAllContacts()
+      .then(allContacts => {
+        setPersons(allContacts)
+        setPersonsDisplay(allContacts)
       })
-    }, [persons])
-    
-  
+    }, []);
+
+  const getContactByNumber = (number) => {
+    return persons.find(person => person.number === number)
+  }
+
+
+
+  const handleDelete = (event) => {
+    const contact = getContactByNumber(event.target.id)
+    if (window.confirm(`Delete ${contact.name}?`)) {
+      people
+        .deleteContact(contact.id)
+        .then(_ => {
+          alert(`${contact.name} sucessfully deleted`)
+          people
+            .getAllContacts()
+            .then(allContacts => {
+              setPersons(allContacts)
+              setPersonsDisplay(allContacts)
+          })
+        })
+    }    
+  }
 
   const handleSearch = (event) => {
     setPersonsDisplay(persons.filter((personObj) => {
@@ -39,14 +63,18 @@ const App = () => {
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    const newPersonObj = createNewPersonObj();
+    const newContactObj = createNewPersonObj();
     
-    if (personExists(newPersonObj)) alert(`${newName} is already added to the phonebook`)
+    if (personExists(newContactObj)) alert(`${newName} is already added to the phonebook`)
     else {
-      setPersons([...persons, newPersonObj])
-      setPersonsDisplay([...persons, newPersonObj])
-      setNewName('')
-      setNewNumber('')
+      people
+        .createContact(newContactObj)
+        .then(newContact => {
+          setPersons([...persons, newContact])
+          setPersonsDisplay([...persons, newContact])
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
@@ -67,22 +95,39 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <PersonsList personsList={personsDisplay} />
+      <PersonsList personsList={personsDisplay} onDeleteClick={handleDelete} />
     </div>
   )
 }
 
 const Person = ({ name, number }) => {
-  return <p>{name} {number}</p>
+  return <span>{name} {number}</span>
 }
 
-const PersonsList = ({ personsList }) => {
+const DeleteButton = ({ contactKey, handleDelete }) => {
+  return (
+    <button 
+      type='button' 
+      style={{marginLeft: '.75em'}}
+      onClick={handleDelete}
+      id={contactKey} 
+    >
+      Delete
+    </button>
+  )
+}
+
+const PersonsList = ({ personsList, onDeleteClick }) => {
   return personsList.map(person =>
-    <Person
-       key={person.number}
-       name={person.name}
-       number={person.number}
-   />)
+    <div key={person.number} style={{padding: '.5em'}}>
+      <Person
+        key={person.number}
+        name={person.name}
+        number={person.number}
+      />
+      <DeleteButton contactKey={person.number} handleDelete={onDeleteClick} />
+    </div>
+   )
 }
 
 const PersonForm = ({ onFormSubmit, handleNewName, newName, handleNewNumber, newNumber }) => {
