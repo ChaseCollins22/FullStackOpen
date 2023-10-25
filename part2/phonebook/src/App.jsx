@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react'
 import people from './services/people'
+import './App.css'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [personsDisplay, setPersonsDisplay] = useState(persons);
+  const [notificatonMessage, setNotificationMessage] = useState(null)
+  const [isErrorNotfication, setIsErrorNotification] = useState(false);
  
   useEffect(() => {
     people
@@ -69,7 +73,17 @@ const App = () => {
           const updatedContacts = persons.map(person => person.id === personObj.id ? updatedContact : person)
           setPersonsDisplay(updatedContacts)
           setPersons(updatedContacts)
+
+          setNotificationMessage(`Successfully updated ${personObj.name}`)
         })
+        .catch(error => {
+          setNotificationMessage(`Information for ${personObj.name} has already been remvoed from the server`);
+          setIsErrorNotification(true)
+        })
+
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5999);
     }
   }
 
@@ -87,13 +101,14 @@ const App = () => {
         .then(newContact => {
           setPersons([...persons, newContact])
           setPersonsDisplay([...persons, newContact])
+          setIsErrorNotification(false)
+          setNotificationMessage(`Successfully added ${newContactObj.name}`)
+
         })
       }
     setNewName('')
     setNewNumber('')
   }
-
-
 
   const handleNewName = (event) => setNewName(event.target.value)
 
@@ -102,6 +117,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificatonMessage} messageType={isErrorNotfication ? 'error' : 'success'}/>
       <Search onSearchChange={handleSearch}/>
       <h2>Add a new</h2>
       <PersonForm 
