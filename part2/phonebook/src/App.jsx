@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import people from './services/people'
 
 const App = () => {
@@ -7,9 +6,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [personsDisplay, setPersonsDisplay] = useState(persons);
-  const [showAllPeople, setShowAllPeople] = useState(true);
-
-
+ 
   useEffect(() => {
     people
       .getAllContacts()
@@ -23,15 +20,12 @@ const App = () => {
     return persons.find(person => person.number === number)
   }
 
-
-
   const handleDelete = (event) => {
     const contact = getContactByNumber(event.target.id)
     if (window.confirm(`Delete ${contact.name}?`)) {
       people
         .deleteContact(contact.id)
         .then(_ => {
-          alert(`${contact.name} sucessfully deleted`)
           people
             .getAllContacts()
             .then(allContacts => {
@@ -61,22 +55,45 @@ const App = () => {
     }
   }
 
+  const nameExists = () => persons.some(personObj => personObj.name === newName);
+
+  const handleNameExists = () => {
+    const windowMessage = `${newName} is already added to phonebook. Replace the old number with a new one?`;
+    if (window.confirm(windowMessage)) {
+      const personObj = getContactByName();
+      const updatedPersonObj = { ...personObj, number: newNumber}
+  
+      people
+        .updateContact(personObj.id, updatedPersonObj)
+        .then(updatedContact => {
+          const updatedContacts = persons.map(person => person.id === personObj.id ? updatedContact : person)
+          setPersonsDisplay(updatedContacts)
+          setPersons(updatedContacts)
+        })
+    }
+  }
+
+  const getContactByName = () => persons.find(personObj => personObj.name === newName)
+  
   const handleFormSubmit = (event) => {
     event.preventDefault();
     const newContactObj = createNewPersonObj();
     
     if (personExists(newContactObj)) alert(`${newName} is already added to the phonebook`)
+    else if (nameExists()) handleNameExists()
     else {
       people
         .createContact(newContactObj)
         .then(newContact => {
           setPersons([...persons, newContact])
           setPersonsDisplay([...persons, newContact])
-          setNewName('')
-          setNewNumber('')
         })
-    }
+      }
+    setNewName('')
+    setNewNumber('')
   }
+
+
 
   const handleNewName = (event) => setNewName(event.target.value)
 
