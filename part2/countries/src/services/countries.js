@@ -8,7 +8,8 @@ const getAllCountries = () => {
 };
 
 const getCountryByName = (countryName) => {
-  axios.get(`${baseURL}/${countryName}`).then((response) => console.log(response.data));
+  const request = axios.get(`${baseURL}/name/${countryName}`);
+  return request.then((response) => response.data);
 };
 
 export default { getCountryByName, getAllCountries };
