@@ -14,6 +14,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+* {
+  font-size: 14px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -27,8 +31,6 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
@@ -66,4 +68,14 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.error {
+  color: red;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
