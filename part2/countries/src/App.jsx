@@ -3,10 +3,10 @@ import countries from './services/countries';
 import './App.css'
 
 function App() {
-  const [countrySearch, setcountrySearch] = useState('');
+  const [countrySearch, setCountrySearch] = useState('');
   const [allCountries, setAllCountries] = useState(null);
-  const [countryDisplay, setcountryDisplay] = useState([]);
-  const [tooManyMatches, setTooManyMatches] = useState(true);
+  const [countryDisplay, setCountryDisplay] = useState([]);
+  const [tooManyMatches, setTooManyMatches] = useState(false);
 
   useEffect(() => {
     countries
@@ -17,37 +17,36 @@ function App() {
       });
   }, []);
 
-  const handleCountryChange = (event) => {
-    setcountrySearch(event.target.value)
+  const getCountryData = async (countryName) => {
+    const country = await countries.getCountryByName(countryName);
+    return {
+      name: country.name.common,
+      capital: country.capital[0],
+      area: country.area,
+      languages: country.languages,
+      flag: country.flags.svg
+    }
+  }
 
+  const handleCountryChange = (event) => {
+    setCountrySearch(event.target.value)
     const searchResults = searchCountriesByName(event.target.value);
-    let countryData;
-    
-    switch (true) {
-      case searchResults.length > 10:
-        //setcountryDisplay(['Too many matches. Please specify further'].concat([]))
-        setTooManyMatches(true)
-        break;
-      case searchResults.length > 1:
-        setcountryDisplay(searchResults.concat([]))
-        setTooManyMatches(false)
-        break
-      case searchResults.length === 1:
-        countries
-          .getCountryByName(searchResults[0])
-          .then(country => {
-            countryData = {
-              name: country.name.common,
-              capital: country.capital[0],
-              area: country.area,
-              languages: country.languages,
-              flag: country.flags.svg
-            }
-            setcountryDisplay([countryData].concat([]))
-          });
-        break;
-      default:
-        setcountryDisplay(['No country found'].concat([]))
+  
+    if (searchResults.length > 10) {
+      setTooManyMatches(true)
+      setCountryDisplay([])
+    } else if (searchResults.length > 1) {
+      setTooManyMatches(false)
+      setCountryDisplay([...searchResults])
+    } else if (searchResults.length === 1) {
+      getCountryData(searchResults[0])
+        .then(countryData => {
+          setCountryDisplay([countryData])
+          setTooManyMatches(false)
+        })
+    } else {
+      setCountryDisplay([])
+      setTooManyMatches(false)
     }
   }
 
@@ -57,42 +56,42 @@ function App() {
       return countryName.includes(countrySearchValue)
     })
   }
- 
+
+  const handleShowCountry = async () => {
+    const countryData = await getCountryData(event.target.id)
+    if (countryData) setCountryDisplay([countryData])
+  }
+
+  const display = () => {
+    if (countryDisplay.length === 1) return <CountryCard  {...countryDisplay[0]} />
+    else if (countryDisplay.length === 0 && !tooManyMatches) return <p>No country found</p>
+    else return <SearchList searchResults={countryDisplay} handleButtonClick={() => handleShowCountry()} />
+  }
+   
   return (
     <>
-      <span>{!allCountries ? 'Loading...' : ''}</span>
-
+      <span>{!allCountries && 'Loading...'}</span>
       <div>
         <label htmlFor="countries">Find countries: </label>
         <input type='text' name='countries' value={countrySearch} onChange={handleCountryChange}></input>
       </div>
-      {typeof countryDisplay[0] !== 'object'
-      ? <SearchList searchResults={countryDisplay} />
-      : <CountryCard  {...countryDisplay[0]} />
-      }
-      {/* {!tooManyMatches
-      ? <SearchList searchResults={countryDisplay} />
-      : <CountryCard  {...countryDisplay[0]} />
-      } */}
-      {
-        tooManyMatches && <p>Too many matches. Please specify further</p>
-      }
+      { tooManyMatches && <p>Too many matches. Please specify further</p> }
+      {display()}
     </>
   )
 }
 
-const SearchList = ({ searchResults }) => {
-  const countriesList = searchResults.map(countryName =>
+
+const SearchList = ({ searchResults, handleButtonClick }) => {
+ return searchResults.map(countryName =>
     <div key={countryName}>
       <span style={{margin: 0, padding: '.5em 0'}}>{countryName}</span>
-      <Button text={'Show country'} handleClick={() => null} />
+      <Button id={countryName} text={'Show country'} handleClick={handleButtonClick} />
     </div>
   )
-
-  return countriesList
 }
 
-const Button = ({ text, handleClick }) => <button onClick={handleClick}>{text}</button>
+const Button = ({ text, handleClick, id }) => <button id={id} onClick={handleClick}>{text}</button>
 
 const CountryCard = ({ name, capital, area, languages, flag}) => {
   const languagesList =  Object.values(languages).map(language => <li key={language}>{language}</li>);
