@@ -8,7 +8,7 @@ const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('some error happened :( ...');
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     noteService
@@ -22,7 +22,7 @@ const App = () => {
       content: newNote,
       important: Math.random() < 0.5,
     }
-  
+
     noteService
       .create(noteObject)
       .then(createdNote => {
@@ -42,10 +42,10 @@ const App = () => {
     noteService
       .update(id, modifiedNote)
       .then(updatedNote => {
-        setNotes(notes.map(note => 
+        setNotes(notes.map(note =>
           note.id === id
-          ? updatedNote
-          : note
+            ? updatedNote
+            : note
         ))
       })
       .catch(error => {
@@ -64,19 +64,19 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
-      <Notification message={errorMessage}/>
+      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all' }
+          show {showAll ? 'important' : 'all'}
         </button>
-      </div>      
+      </div>
       <ul>
-        {notesToShow.map(note => 
-          <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)}/>
+        {notesToShow.map(note =>
+          <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)} />
         )}
       </ul>
       <form onSubmit={addNote}>
-      <input
+        <input
           value={newNote}
           onChange={handleNoteChange}
         />
