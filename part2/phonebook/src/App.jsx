@@ -29,7 +29,7 @@ const App = () => {
     if (window.confirm(`Delete ${contact.name}?`)) {
       people
         .deleteContact(contact.id)
-        .then(_ => {
+        .then(() => {
           people
             .getAllContacts()
             .then(allContacts => {
@@ -37,6 +37,10 @@ const App = () => {
               setPersonsDisplay(allContacts)
           })
         })
+        .then(setNotificationMessage(`Successfully deleted ${contact.name}`))
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
     }    
   }
 
@@ -103,9 +107,11 @@ const App = () => {
           setPersonsDisplay([...persons, newContact])
           setIsErrorNotification(false)
           setNotificationMessage(`Successfully added ${newContactObj.name}`)
-
         })
       }
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 5000)
     setNewName('')
     setNewNumber('')
   }
