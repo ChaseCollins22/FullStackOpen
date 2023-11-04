@@ -39,44 +39,36 @@ app.get('/api/notes', (request, response) => {
 });
 
 app.get('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const note = notes.find(note => note.id === id)
-  
-  if (note) response.json(note)
-  response.statusMessage = "No note found";
-  response.status(404).end()
+  const id = request.params.id
+  Note
+    .find({ _id: { $eq: id } })
+    .then(note => response.json(note))
+    .catch(error => {
+      response.statusMessage = "No note found";
+      response.status(404).end()
+    })
 })
 
 app.delete('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
+  const id = request.params.id
   notes = notes.filter(note => note.id !== id);
 
   response.status(204).end()
 })
 
 app.post('/api/notes', (request, response) => {
-  function generateId() {
-    const maxId = notes.length > 0 
-          ? Math.max.apply(null, notes.map(note => note.id))
-          : 0
-    return maxId + 1
-  }
-
   if (!request.body.content) {
     return response.status(400).json({
       error: 'content missing'
     })
   }
 
-  const note = {
+  const note = new Note({
     content: request.body.content,
     important: request.body.important || false,
-    id: generateId()
-  }
-  
-  notes = [...notes, note]
+  })
 
-  response.json(note)
+  note.save().then(savedNote => response.json(savedNote)) 
 })
 
 const PORT = process.env.PORT || 3001
