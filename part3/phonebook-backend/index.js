@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors')
+const Person = require('./models/contact')
+
 const app = express();
 
 const morgan = require('morgan');
@@ -40,7 +42,9 @@ const generateId = () => {
 }
 
 app.get('/api/persons', (request, response) => {
-  response.json(contacts)
+  Person
+    .find({})
+    .then(contacts => response.json(contacts))
 })
 
 app.get('/info', (request, response) => {
@@ -78,24 +82,14 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const contactExists = contacts.find(contact => {
-    return (contact.name === request.body.name &&
-           contact.number === request.body.number)
-  })
-
-  if (contactExists) return response.status(400).json({
-    error: 'Contact already exists'
-  })
-
-  const newContact = {
-    id: generateId(),
+  const newContact = new Person({
     name: request.body.name,
     number: request.body.number
-  }
+  })
 
-  contacts = [...contacts, newContact]
-
-  response.json(newContact)
+  newContact
+    .save(newContact)
+    .then(newContact => response.json(newContact))
 })
 
 const PORT = process.env.PORT || 3001;
