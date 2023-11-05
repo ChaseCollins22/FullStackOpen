@@ -41,12 +41,8 @@ app.get('/api/notes', (request, response) => {
 app.get('/api/notes/:id', (request, response) => {
   const id = request.params.id
   Note
-    .find({ _id: { $eq: id } })
+    .findById(id)
     .then(note => response.json(note))
-    .catch(error => {
-      response.statusMessage = "No note found";
-      response.status(404).end()
-    })
 })
 
 app.delete('/api/notes/:id', (request, response) => {
