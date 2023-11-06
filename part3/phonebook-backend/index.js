@@ -37,10 +37,6 @@ let contacts = [
   }
 ]
 
-const generateId = () => {
-  return Math.floor(Math.random() * MAX_CONTACTS)
-}
-
 app.get('/api/persons', (request, response) => {
   Person
     .find({})
@@ -54,25 +50,30 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const contact = contacts.find(contact => contact.id === id)
+  const id = request.params.id
 
-  if (contact) response.json(contact)
-
-  return response.status(404).end()
+  Person
+    .findById(id)
+    .then(contact => response.json(contact))
+    .catch(error => response.status(404).end())
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const contact = contacts.find(contact => contact.id === id);
-
-  if (contact) {
-    contacts = contacts.filter(contact => contact.id !== id)
-    response.status(204).end()
-  } else {
-    response.statusMessage = 'Contact not found'
-    response.status(404).end()
+app.delete('/api/persons/:id', async (request, response, next) => {
+  const id = request.params.id
+  
+  try {
+    const contactToDelete = await Person.findByIdAndDelete(id)
+    if (contactToDelete) {
+      console.log(`Contact: ${contactToDelete.name} successfully deleted`);
+      return response.status(204).end()
+    } else {
+      response.status(404).end()
+    }
+  } catch (error) {
+    console.log(error);
+    next(error)
   }
+
 })
 
 app.post('/api/persons', (request, response) => {
@@ -92,7 +93,19 @@ app.post('/api/persons', (request, response) => {
     .then(newContact => response.json(newContact))
 })
 
+const handleError = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.message === 'CastError') {
+    response.status(400).send(({ error: 'malformatted id '}))
+  }
+
+  next(error)
+}
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 })
+
+app.use(handleError)
