@@ -43,19 +43,29 @@ app.get('/api/persons', (request, response) => {
     .then(contacts => response.json(contacts))
 })
 
-app.get('/info', (request, response) => {
-  const totalContacts = contacts.length
-  const dateNow = new Date().toString()
-  response.send(`<p>Phonebook has info for ${totalContacts} people</p><p>${dateNow}</p>`)
+app.get('/info', async (request, response, next) => {
+  try {
+    const dateNow = new Date().toString()
+    const allContacts = await Person.find({})
+    if (allContacts) {
+      response.send(`<p>Phonebook has info for ${allContacts.length} people</p><p>${dateNow}</p>`)
+    } else {
+      response.status(404).end()
+    }
+  } catch(error) {
+    next(error)
+  }
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', async (request, response, next) => {
   const id = request.params.id
-
-  Person
-    .findById(id)
-    .then(contact => response.json(contact))
-    .catch(error => response.status(404).end())
+  try { 
+    const contact = await Person.findById(id)
+    if (contact) response.json(contact)
+    else response.status(404).end()
+  } catch(error) {
+    next(error)
+  }
 })
 
 app.delete('/api/persons/:id', async (request, response, next) => {
@@ -64,13 +74,12 @@ app.delete('/api/persons/:id', async (request, response, next) => {
   try {
     const contactToDelete = await Person.findByIdAndDelete(id)
     if (contactToDelete) {
-      console.log(`Contact: ${contactToDelete.name} successfully deleted`);
+      console.log(`Contact: ${contactToDelete.name, contactToDelete.number} successfully deleted`);
       return response.status(204).end()
     } else {
-      response.status(404).end()
+      response.status(404).json({ error: 'Contact not found' })
     }
   } catch (error) {
-    console.log(error);
     next(error)
   }
 
@@ -93,10 +102,28 @@ app.post('/api/persons', (request, response) => {
     .then(newContact => response.json(newContact))
 })
 
-const handleError = (error, request, response, next) => {
-  console.error(error.message);
+app.put('/api/persons/:id', async (request, response, next) => {
+  const id = request.params.id;
+  
+  const updatedContact = {
+    name: request.body.name,
+    number: request.body.number
+  }
+  
+  try {
+    const contact = await Person.findByIdAndUpdate(id, updatedContact, { new: true })
+    if (contact) {
+      console.log(`Successfully updated contact: { name: ${contact.name}, number: ${contact.number} }`);
+      response.json(contact)
+    } else response.status(404).json({ error: 'Contact not found' })
+  } catch (error) {
+    next(error)
+  }
+})
 
-  if (error.message === 'CastError') {
+function handleError(error, request, response, next) {
+
+  if (error.name === 'CastError') {
     response.status(400).send(({ error: 'malformatted id '}))
   }
 
