@@ -12,31 +12,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 app.use(cors())
 app.use(express.static('dist'))
 
-const MAX_CONTACTS = 500;
-
-let contacts = [
-  { 
-    "id": 1,
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": 2,
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": 3,
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": 4,
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
-
 app.get('/api/persons', (request, response) => {
   Person
     .find({})
@@ -85,7 +60,7 @@ app.delete('/api/persons/:id', async (request, response, next) => {
 
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   if (!request.body.name || !request.body.number) {
     return response.status(400).json({
       error: 'Name or number missing'
@@ -99,19 +74,20 @@ app.post('/api/persons', (request, response) => {
 
   newContact
     .save(newContact)
-    .then(newContact => response.json(newContact))
+    .then(newContact => response.json(newContact).end())
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', async (request, response, next) => {
   const id = request.params.id;
-  
-  const updatedContact = {
-    name: request.body.name,
-    number: request.body.number
-  }
+  const { name, number } = request.body;
   
   try {
-    const contact = await Person.findByIdAndUpdate(id, updatedContact, { new: true })
+    const contact = await Person.findByIdAndUpdate(
+      id,
+      { name, number },
+      { new: true, runValidators: true, context: 'query' }
+    )
     if (contact) {
       console.log(`Successfully updated contact: { name: ${contact.name}, number: ${contact.number} }`);
       response.json(contact)
@@ -122,9 +98,15 @@ app.put('/api/persons/:id', async (request, response, next) => {
 })
 
 function handleError(error, request, response, next) {
-
   if (error.name === 'CastError') {
-    response.status(400).send(({ error: 'malformatted id '}))
+    response.status(400).send({ error: 'malformatted id '})
+  } else if (error.name === 'ValidationError') {
+    if (error.errors.name) {
+      response.status(400).send({ error: 'Error: Name must be 3 or more characters long'})
+    } else if (error.errors.number) {
+      response.status(400).send({ error: 'Error: Number must have the format XXX-XXX-XXXX and be at least 8 characters long'})
+    } 
+    response.status(400).send({ error: error.message })
   }
 
   next(error)
