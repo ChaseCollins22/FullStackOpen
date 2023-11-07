@@ -108,6 +108,11 @@ const App = () => {
           setIsErrorNotification(false)
           setNotificationMessage(`Successfully added ${newContactObj.name}`)
         })
+        .catch(error => {
+          console.log('ERROR:', error);
+          setIsErrorNotification(true)
+          setNotificationMessage(error.response.data.error)
+        })
       }
     setTimeout(() => {
       setNotificationMessage(null)
