@@ -20,6 +20,7 @@ mongoose
     console.log(`Failed to connect to DB...`);
   });
 
+app.use(cors())
 app.use(express.json())
 app.use('/', router)
 

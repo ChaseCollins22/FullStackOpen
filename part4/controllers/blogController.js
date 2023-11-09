@@ -1,6 +1,10 @@
 const router = require('express').Router()
 const Blog = require('../models/blogDB');
 
+router.get('/', (request, response) => {
+  return response.send('<h1>Welcome to my blog muthafucka</h1>')
+})
+
 router.get('/api/blogs', (request, response) => {
   Blog
     .find({})
