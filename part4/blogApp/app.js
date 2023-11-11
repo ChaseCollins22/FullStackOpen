@@ -16,8 +16,9 @@ mongoose
   .then(() => {
     logger.info(`Connected to ${config.MONGO_DB_URI}`)
   })
-  .catch(() => {
+  .catch((error) => {
     console.log(`Failed to connect to DB...`);
+    console.log(error);
   });
 
 app.use(cors())
