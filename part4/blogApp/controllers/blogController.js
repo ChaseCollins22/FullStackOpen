@@ -17,16 +17,16 @@ router.post('/api/blogs', (request, response) => {
     title: request.body.title,
     author: request.body.author,
     url: request.body.url,
-    likes: request.body.likes
+    likes: request.body.likes || 0 
   })
 
   newBlog
     .save()
     .then((blog) => {
       console.log(`${blog.title} by ${blog.author} successfully saved!`)
-      response.json(blog).end()
+      response.status(201).json(blog).end()
     })
-    .catch(error => console.log(error))
+    .catch(error => response.status(400).end())
 })
 
 module.exports = router
