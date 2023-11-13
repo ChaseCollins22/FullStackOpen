@@ -3,7 +3,9 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Note = require('../models/note')
+const User = require('../models/user')
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
 
 
 beforeEach(async () => {
@@ -150,8 +152,6 @@ describe('when there is initially one user in db', () => {
     expect(usersAtEnd).toEqual(usersAtStart)
   })
 })
-
-
 
 afterAll(async () => {
   await mongoose.connection.close()
