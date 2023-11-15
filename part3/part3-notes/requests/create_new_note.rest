@@ -1,9 +1,9 @@
 POST http://localhost:10000/api/notes
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ilplcm9vb19jb29vTCIsImlkIjoiNjU1MmI0YTA0ZTBmZTg0YmVjMTA2OWY1IiwiaWF0IjoxNjk5OTkxMDUxfQ.0i69E-k5Ic4l8-sYaRQpJpLdaZOLfT69T_7Rjl7FQS8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFETUlOIiwiaWQiOiI2NTU0ZTc1M2M0YjBiMWFjYWMzYzVjNGQiLCJpYXQiOjE3MDAwNjMwODh9.eKPq3Ci5vGXQpDy2E0UWvMMGUh2aPXpXf34Jj04IFP4
 
 {
-  "content": "HERE @ the bucks",
+  "content": "Wassup dawg! This is the administrator!",
   "important": "true",
-  "userId": "6552b4a04e0fe84bec1069f5"
+  "userId": "6554e753c4b0b1acac3c5c4d"
 }

@@ -2,7 +2,7 @@ POST http://localhost:3005/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Life",
+  "title": "Can still create a new post?",
   "author": "Chase Collins",
   "url": "https://chasecollins.dev",
   "likes": "432000"

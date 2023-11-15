@@ -2,16 +2,13 @@ const router = require('express').Router()
 const Blog = require('../models/blogDB');
 
 router.get('/', (request, response) => {
-  return response.send('<h1>Welcome to my blog muthafucka</h1>')
-})
-
-router.get('/api/blogs', (request, response) => {
   Blog
     .find({})
     .then((blogs) => response.json(blogs))
+  
 })
 
-router.post('/api/blogs', (request, response) => {
+router.post('/', (request, response) => {
   const newBlog = new Blog({
     title: request.body.title,
     author: request.body.author,
@@ -28,13 +25,13 @@ router.post('/api/blogs', (request, response) => {
     .catch(error => response.status(400).end())
 })
 
-router.delete('/api/blogs/:id', async (request, response) => {
+router.delete('/:id', async (request, response) => {
   const id = request.params.id
   const deletedBlog = await Blog.findByIdAndDelete(id)
   response.status(200).json(deletedBlog)
 })
 
-router.put('/api/blogs/:id', async (request, response) => {
+router.put('/:id', async (request, response) => {
   const { id, title, author, url , likes } = request.body
 
   const updatedBlog = await Blog.findByIdAndUpdate(
