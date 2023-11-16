@@ -1,12 +1,14 @@
 const usersRouter = require('express').Router();
 const { Error } = require('mongoose');
 const User = require('../models/userDB')
+const Blog = require('../models/blogDB')
 const bcrypt = require('bcrypt')
 
 require('express-async-errors')
 
 usersRouter.get('/', async (request, response) => {
-  const allUsers = await User.find({})
+  const allUsers = await User.find({}).populate('blogs', { url: 1, title: 1, author: 1, id: 1 })
+  
   response.json(allUsers)
 
 })

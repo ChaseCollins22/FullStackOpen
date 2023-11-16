@@ -1,28 +1,36 @@
 const router = require('express').Router()
 const Blog = require('../models/blogDB');
+const User = require('../models/userDB')
 
-router.get('/', (request, response) => {
-  Blog
-    .find({})
-    .then((blogs) => response.json(blogs))
-  
+router.get('/', async (request, response) => {
+  const allBlogs = await Blog.find({}).populate('user')
+  response.json(allBlogs)
 })
 
-router.post('/', (request, response) => {
+router.post('/', async (request, response) => {
+  const user = await User.find({})
+
   const newBlog = new Blog({
     title: request.body.title,
     author: request.body.author,
     url: request.body.url,
-    likes: request.body.likes || 0 
+    likes: request.body.likes || 0,
+    user: user[0]
   })
-
-  newBlog
-    .save()
-    .then((blog) => {
-      console.log(`${blog.title} by ${blog.author} successfully saved!`)
-      response.status(201).json(blog).end()
-    })
-    .catch(error => response.status(400).end())
+  
+  const savedBlog = await newBlog.save()
+  console.log(savedBlog);
+  console.log(`${savedBlog.title} by ${savedBlog.author} successfully saved!`)
+  console.log('ZERO', user[0]._doc);
+  const updatedUser = await User.findByIdAndUpdate(
+    user[0].id,
+    // { id: user[0].id, name: user[0].name, username: user[0].username, blogs: [...user[0].blogs, savedBlog.id] },
+    { ...user[0]._doc, blogs: [...user[0]._doc.blogs, savedBlog.id] },
+    { new: true, runValidators: false, context: 'query' }
+  )
+  console.log(updatedUser);
+  response.status(201).json(savedBlog).end()
+  
 })
 
 router.delete('/:id', async (request, response) => {
