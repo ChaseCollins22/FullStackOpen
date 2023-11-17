@@ -8,7 +8,7 @@ require('express-async-errors')
 
 usersRouter.get('/', async (request, response) => {
   const allUsers = await User.find({}).populate('blogs', { url: 1, title: 1, author: 1, id: 1 })
-  
+
   response.json(allUsers)
 
 })
@@ -21,7 +21,7 @@ usersRouter.post('/', async (request, response, next) => {
 
   const passwordHash = await bcrypt.hash(password, 10)
 
-  const newUser = new User({ ...request.body, password: passwordHash })
+  const newUser = new User({ ...request.body, password: passwordHash, blogs: [] })
 
   const savedUser = await newUser.save()
 

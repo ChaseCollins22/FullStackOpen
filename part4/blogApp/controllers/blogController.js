@@ -1,42 +1,60 @@
 const router = require('express').Router()
 const Blog = require('../models/blogDB');
 const User = require('../models/userDB')
+const jwt = require('jsonwebtoken')
+require('express-async-errors')
 
 router.get('/', async (request, response) => {
-  const allBlogs = await Blog.find({}).populate('user')
+  const allBlogs = await Blog.find({}).populate('user', { blogs: 0 })
   response.json(allBlogs)
 })
 
 router.post('/', async (request, response) => {
-  const user = await User.find({})
-
+  const decodedToken = await jwt.verify(request.token, process.env.SECRET)
+  
   const newBlog = new Blog({
     title: request.body.title,
     author: request.body.author,
     url: request.body.url,
     likes: request.body.likes || 0,
-    user: user[0]
+    user: decodedToken.id
   })
   
-  const savedBlog = await newBlog.save()
-  console.log(savedBlog);
-  console.log(`${savedBlog.title} by ${savedBlog.author} successfully saved!`)
-  console.log('ZERO', user[0]._doc);
-  const updatedUser = await User.findByIdAndUpdate(
-    user[0].id,
-    // { id: user[0].id, name: user[0].name, username: user[0].username, blogs: [...user[0].blogs, savedBlog.id] },
-    { ...user[0]._doc, blogs: [...user[0]._doc.blogs, savedBlog.id] },
-    { new: true, runValidators: false, context: 'query' }
+  const savedBlog = await newBlog.save() 
+
+  const user = await User.findById(decodedToken.id)
+  const userData = user._doc
+
+  // Add savedBlog to the user's blog list 
+  const updatedUser = await User.findByIdAndUpdate( 
+    decodedToken.id,
+    { 
+      ...userData,
+      blogs: [...userData.blogs, savedBlog.id]
+    },
+    { 
+      new: true,
+      context: 'query'
+    }
   )
-  console.log(updatedUser);
+
+  console.log('UPDATED USER', updatedUser);
+
   response.status(201).json(savedBlog).end()
-  
 })
 
 router.delete('/:id', async (request, response) => {
   const id = request.params.id
-  const deletedBlog = await Blog.findByIdAndDelete(id)
-  response.status(200).json(deletedBlog)
+  const decodedToken = await jwt.verify(request.token, process.env.SECRET)
+  
+  const blogToDelete = await Blog.findById(id)
+
+  if (String(blogToDelete.user) === decodedToken.id) {
+    const deletedBlog = await Blog.findByIdAndDelete(id)
+    response.status(200).json(deletedBlog)
+  } else {
+    response.status(401).json('Sorry, you do not have permission to delete this blog post')
+  }
 })
 
 router.put('/:id', async (request, response) => {

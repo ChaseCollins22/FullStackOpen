@@ -1,9 +1,10 @@
 POST http://localhost:3005/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1yLkNSQyIsImlkIjoiNjU1NjNkODQ0ODYwOGYzMGZmNTcyMWIyIiwiaWF0IjoxNzAwMTU4MDg0fQ.l42Rr9CvO8eaRSArXKGxmBYYE7Q32i4NwJUnEg4hyJA
 
 {
-  "title": "Adding a new blog",
-  "author": "Chase Collins",
+  "title": "test3",
+  "author": "Your boi",
   "url": "https://chasecollins.dev",
-  "likes": "432000"
+  "likes": "10132"
 }

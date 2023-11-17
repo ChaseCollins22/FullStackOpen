@@ -24,7 +24,17 @@ const errorHandler = (error, request, response, next) => {
     }
   } else if (error.name === 'MongooseError') {
     response.status(400).json({ error: error.message })
+  } else if (error.name === 'JsonWebTokenError') {
+    response.status(400).json({ error: error.message })
   }
 }
 
-module.exports = { requestLogger, errorHandler }
+const tokenExtractor = (request, respose, next) => {
+  const authorization = request.get('authorization')
+  if (authorization) {
+    request.token = authorization.replace('Bearer', '').trim()
+  }
+  next()
+}
+
+module.exports = { requestLogger, errorHandler, tokenExtractor }
