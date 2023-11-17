@@ -3,21 +3,17 @@ const { Error } = require('mongoose');
 const User = require('../models/userDB')
 const Blog = require('../models/blogDB')
 const bcrypt = require('bcrypt')
-
+require('dotenv').config()
 require('express-async-errors')
 
 usersRouter.get('/', async (request, response) => {
   const allUsers = await User.find({}).populate('blogs', { url: 1, title: 1, author: 1, id: 1 })
-
   response.json(allUsers)
-
 })
 
 usersRouter.post('/', async (request, response, next) => {
   const { name, username, password } = request.body
   if (password.length < 3) return next(new Error('password must be at least 3 characters long'))
-
-  console.log('BODY', request.body)
 
   const passwordHash = await bcrypt.hash(password, 10)
 
@@ -29,7 +25,6 @@ usersRouter.post('/', async (request, response, next) => {
 
   response.json(savedUser)
 })
-
 
 
 

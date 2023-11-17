@@ -1,9 +1,9 @@
 POST http://localhost:3005/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1yLkNSQyIsImlkIjoiNjU1NjNkODQ0ODYwOGYzMGZmNTcyMWIyIiwiaWF0IjoxNzAwMTU4MDg0fQ.l42Rr9CvO8eaRSArXKGxmBYYE7Q32i4NwJUnEg4hyJA
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFETUlOIiwiaWQiOiI2NTU2YzM3MGE3MWMxM2UwYWQ1YWNmNTMiLCJpYXQiOjE3MDAxODQ5ODR9.fu7ecyEC9Kr8xewwEzkuJRjzo-OA1t85t3nucbddEiY
 
 {
-  "title": "test3",
+  "title": "BLOG TEST2",
   "author": "Your boi",
   "url": "https://chasecollins.dev",
   "likes": "10132"

@@ -3,6 +3,7 @@ const Blog = require('../models/blogDB');
 const User = require('../models/userDB')
 const jwt = require('jsonwebtoken')
 require('express-async-errors')
+require('dotenv').config()
 
 router.get('/', async (request, response) => {
   const allBlogs = await Blog.find({}).populate('user', { blogs: 0 })
@@ -22,34 +23,30 @@ router.post('/', async (request, response) => {
   
   const savedBlog = await newBlog.save() 
 
-  const user = await User.findById(decodedToken.id)
-  const userData = user._doc
+  const userData = request.user
 
-  // Add savedBlog to the user's blog list 
-  const updatedUser = await User.findByIdAndUpdate( 
-    decodedToken.id,
-    { 
-      ...userData,
-      blogs: [...userData.blogs, savedBlog.id]
-    },
-    { 
-      new: true,
-      context: 'query'
-    }
-  )
-
-  console.log('UPDATED USER', updatedUser);
+  await User
+    .findByIdAndUpdate( 
+      decodedToken.id,
+      { 
+        ...userData,
+        blogs: [...userData.blogs, savedBlog.id]
+      },
+      { 
+        new: true,
+        context: 'query'
+      }
+    )
 
   response.status(201).json(savedBlog).end()
 })
 
 router.delete('/:id', async (request, response) => {
   const id = request.params.id
-  const decodedToken = await jwt.verify(request.token, process.env.SECRET)
-  
+  const user = request.user
   const blogToDelete = await Blog.findById(id)
 
-  if (String(blogToDelete.user) === decodedToken.id) {
+  if (String(blogToDelete.user) === String(user._id)) {
     const deletedBlog = await Blog.findByIdAndDelete(id)
     response.status(200).json(deletedBlog)
   } else {

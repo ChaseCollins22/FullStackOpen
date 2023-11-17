@@ -1,3 +1,7 @@
+const User = require('../models/userDB')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
+
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
@@ -25,7 +29,7 @@ const errorHandler = (error, request, response, next) => {
   } else if (error.name === 'MongooseError') {
     response.status(400).json({ error: error.message })
   } else if (error.name === 'JsonWebTokenError') {
-    response.status(400).json({ error: error.message })
+    response.status(401).json({ error: error.message })
   }
 }
 
@@ -37,4 +41,13 @@ const tokenExtractor = (request, respose, next) => {
   next()
 }
 
-module.exports = { requestLogger, errorHandler, tokenExtractor }
+const userExtractor = async (request, response, next) => {
+  if (request.token) {
+    const decodedToken = await jwt.verify(request.token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
+    request.user = user._doc
+  }
+  next()
+}
+
+module.exports = { requestLogger, errorHandler, tokenExtractor, userExtractor }
