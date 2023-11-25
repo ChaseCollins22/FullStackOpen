@@ -1,0 +1,31 @@
+.form-field {
+  display: grid;
+  grid-template-columns: 4.5em 10em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+}
+
+.submit-btn {
+  margin-top: 2em;
+}
+
+.notification {
+  color: black;
+  padding: 1em;
+  border-radius: 1em;
+  font-size: 1em;
+  font-weight: bold;
+  width: fit-content;
+}
+
+.success-notification {
+  background-color: lightgreen;
+}
+
+.failure-notification {
+  background-color: lightcoral;
+}
