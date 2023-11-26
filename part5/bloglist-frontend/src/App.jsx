@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import './App.css'
 
 const App = () => {
@@ -12,6 +13,8 @@ const App = () => {
   const [notification, setNotification] = useState(null)
   const [displayBlogForm, setDisplayBlogForm] = useState(false)
 
+  const blogFormRef = useRef();
+
   const fetchBlogs = async () => {
     const blogs = await blogService.getAll()
     setBlogs(blogs)
@@ -19,6 +22,7 @@ const App = () => {
 
   const handleNewBlog = async (e) => {
     e && e.preventDefault()
+    blogFormRef.current.toggleVisibility()
 
     const blogObj = {
       title: e.target[0].value,
@@ -74,21 +78,10 @@ const App = () => {
     }
   }
 
+
   const handleLogout = () => {
     window.localStorage.removeItem('user')
     setUser(null)
-  }
-
-  const handleFormDisplay = () => {
-    setDisplayBlogForm(!displayBlogForm)
-  }
-
-  const handleTest = () => {
-    if (displayBlogForm) {
-      handleNewBlog()
-    } else {
-      handleFormDisplay()
-    }
   }
 
   if (user) {
@@ -98,12 +91,9 @@ const App = () => {
         <button onClick={handleLogout}>Logout</button>
         {notification && <p className='notification success-notification'>{notification}</p>}
         <h2>Create New</h2>
-        <BlogForm
-          handleSubmit={handleNewBlog}
-          handleFormDisplay={handleFormDisplay}
-          displayForm={displayBlogForm}
-          handleCreateBtn={handleTest}
-        />
+        <Togglable buttonLabel='Create' ref={blogFormRef}>
+          <BlogForm createBlog={handleNewBlog} />
+        </Togglable>
         <h2>All Blogs</h2>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />

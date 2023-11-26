@@ -1,26 +1,55 @@
-const BlogForm = ({ handleSubmit, handleFormDisplay, displayForm, handleCreateBtn }) => {
-  const displayFormStyle = { display: displayForm ? '' : 'none' }
+import { useState } from "react"
+
+const BlogForm = ({ createBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const addBlog = (e) => {
+    createBlog(e)
+
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+  }
+
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="form" style={displayFormStyle}>
+    <form onSubmit={addBlog}>
+      <div className="form">
         <div className="form-field">
           <label htmlFor="title">Title</label>
-          <input type="text" id="title" required />
+          <input
+            type="text"
+            id="title"
+            required
+            onChange={(e) => setTitle(e.target.value)}
+          />
         </div>
         <div className="form-field">
           <label htmlFor="author">Author</label>
-          <input type="text" id="author" required />
+          <input
+            type="text"
+            id="author"
+            required
+            onChange={(e) => setAuthor(e.target.value)}
+          />
         </div>
         <div className="form-field">
           <label htmlFor="url">URL</label>
-          <input type="text" id="url" required />
+          <input
+            type="text"
+            id="url"
+            required
+            onChange={(e) => setUrl(e.target.value)}
+          />
         </div>
       </div>
-      <button className="submit-btn" type="submit" onClick={handleCreateBtn}>Create</button>
-      <button type="button" style={displayFormStyle} onClick={handleFormDisplay}>Cancel</button>
+      <button className="submit-btn" type="submit">Create</button>
     </form>
   )
 }
+
+
 
 export default BlogForm
