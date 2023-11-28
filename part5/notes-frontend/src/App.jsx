@@ -13,7 +13,7 @@ const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -22,7 +22,7 @@ const App = () => {
     noteService
       .getAll()
       .then(allNotes => setNotes(allNotes))
-  }, []);
+  }, [])
 
   useEffect(() => {
     const existingUser = window.localStorage.getItem('currUser')
@@ -43,7 +43,7 @@ const App = () => {
         setNotes([...notes, returnedNote])
       })
   }
-  
+
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
@@ -54,7 +54,7 @@ const App = () => {
       window.localStorage.setItem('currUser', JSON.stringify(user))
       noteService.setToken(user.token)
     } catch (error) {
-      console.log(error);
+      console.log(error)
       setErrorMessage('Invalid Credentials')
       setTimeout(() => {
         setErrorMessage(null)
@@ -79,7 +79,7 @@ const App = () => {
         setErrorMessage(`The note, '${note.content}' has already been removed from the server`)
         setTimeout(() => {
           setErrorMessage(null)
-        }, 5000);
+        }, 5000)
         setNotes(notes.filter(note => note.id !== id))
       })
   }
@@ -87,13 +87,13 @@ const App = () => {
   const loginForm = () => {
     return (
       <Togglable buttonLabel='Login'>
-          <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={(e) => setUsername(e.target.value)}
-            handlePasswordChange={(e) => setPassword(e.target.value)}
-            handleSubmit={handleLogin}
-          />
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={(e) => setUsername(e.target.value)}
+          handlePasswordChange={(e) => setPassword(e.target.value)}
+          handleSubmit={handleLogin}
+        />
       </Togglable>
     )
   }
@@ -104,7 +104,7 @@ const App = () => {
         <NoteForm
           createNote={addNote}
         />
-    </Togglable>
+      </Togglable>
     )
   }
 
@@ -117,12 +117,12 @@ const App = () => {
       <h1>Notes</h1>
       <Notification message={errorMessage} />
       { loginForm() }
-      
-      { 
-      user && 
+
+      {
+        user &&
       <div>
         <p>{user.name} logged in!</p>
-       
+
       </div>
       }
       { noteForm() }

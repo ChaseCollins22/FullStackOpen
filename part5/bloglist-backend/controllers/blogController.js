@@ -45,7 +45,7 @@ router.delete('/:id', async (request, response) => {
   const id = request.params.id
   const user = request.user
   const blogToDelete = await Blog.findById(id)
-
+  
   if (String(blogToDelete.user) === String(user._id)) {
     const deletedBlog = await Blog.findByIdAndDelete(id)
     response.status(200).json(deletedBlog)

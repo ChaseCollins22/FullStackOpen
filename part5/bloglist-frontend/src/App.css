@@ -29,3 +29,29 @@
 .failure-notification {
   background-color: lightcoral;
 }
+
+.blog {
+  border: 1px solid black;
+  border-radius: .5em;
+  padding: 1em;
+  margin-bottom: .75em;
+}
+
+.view-blog-btn {
+  margin-left: 1em;
+}
+
+.hide-blog-btn {
+  margin-left: 1em;
+}
+
+.like-btn {
+  margin-left: 1em;
+}
+
+.logout-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1em;
+  margin-right: 10%;
+}
