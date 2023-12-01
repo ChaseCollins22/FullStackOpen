@@ -31,17 +31,17 @@ function Blog({
               Title:
               {blog.title}
             </span>
-            <button className="hide-blog-btn" onClick={(e) => setDetailsVisible(!detailsVisible)}>Hide</button>
+            <button className="hide-blog-btn" onClick={() => setDetailsVisible(!detailsVisible)}>Hide</button>
             <p>
               Author:
               {blog.author}
             </p>
-            <span>
+            <span data-testid="likes">
               Likes:
               {likeCount}
             </span>
             <button className="like-btn" onClick={incrementLikes}>Like</button>
-            <p>
+            <p data-testid="url">
               URL:
               {blog.url}
             </p>
@@ -53,7 +53,7 @@ function Blog({
             {blog.title}
             {' '}
             {blog.author}
-            <button className="view-blog-btn" onClick={(e) => setDetailsVisible(!detailsVisible)}>View</button>
+            <button className="view-blog-btn" onClick={() => setDetailsVisible(!detailsVisible)} id='view-blog-btn'>View</button>
           </div>
         )
       }

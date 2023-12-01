@@ -35,3 +35,4 @@ test('clicking the button calls event handler once', async () => {
 
   expect(mockEventHandler.mock.calls).toHaveLength(1)
 })
+
