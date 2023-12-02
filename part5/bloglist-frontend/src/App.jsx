@@ -20,15 +20,9 @@ function App() {
     setBlogs(allBlogs);
   };
 
-  const handleNewBlog = async (e) => {
-    e && e.preventDefault();
+  const handleNewBlog = async (e, blogObj) => {
+    e.preventDefault()
     blogFormRef.current.toggleVisibility();
-
-    const blogObj = {
-      title: e.target[0].value,
-      author: e.target[1].value,
-      url: e.target[2].value,
-    };
 
     const blog = await blogService.createBlog(blogObj);
     for (const formField of e.target) {

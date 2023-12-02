@@ -6,8 +6,13 @@ function BlogForm({ createBlog }) {
   const [url, setUrl] = useState('');
 
   const addBlog = (e) => {
-    createBlog(e);
+    const blogObj = {
+      title: e.target[0].value,
+      author: e.target[1].value,
+      url: e.target[2].value,
+    };
 
+    createBlog(e, blogObj)
     setTitle('');
     setAuthor('');
     setUrl('');
