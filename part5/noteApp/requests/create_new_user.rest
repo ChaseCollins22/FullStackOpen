@@ -3,6 +3,6 @@ Content-Type: application/json
 
 {
   "username": "ADMIN",
-  "name": "The almighty admin",
+  "name": "Administrator",
   "password": "Password101"
 }
