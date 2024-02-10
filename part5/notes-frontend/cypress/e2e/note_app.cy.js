@@ -1,6 +1,8 @@
+import { log } from "console"
+
 describe('Note app', function() {
   beforeEach(function() {
-    cy.login({ username: 'ccol420', password: 'thisismypassword'})
+    cy.login({ username: 'ccol69', password: 'thisismypassword'})
   })
 
   it('front page can be opened',  function() {
@@ -13,38 +15,44 @@ describe('Note app', function() {
   })
 
   it('user can login', function() {
-    cy.login({ username: 'ccol420', password: 'thisismypassword'})
+    cy.login({ username: 'ccol69', password: 'thisismypassword'})
   })
 
-  it.only('login fails with wrong password', function() {
-    cy.login({ username: 'ccol420', password: 'NOTTHEPASSWORD'})
-      .then((response) => {
-        expect(response.status).to.eq(401)
-      })
-    cy.contains('Invalid Credentials')
-    cy.get('.error').contains('Invalid Credentials')
+  it('login fails with wrong password', function() {
+    const incorrectCredentials = {
+      username: 'ccol69',
+      password: 'wrongpassword'
+    };
 
-    cy.contains('Chase Collins logged in!').should('not.exist')
+    cy.request({
+      method: 'POST',
+      url: `${Cypress.env('BACKEND')}/login`, 
+      body: incorrectCredentials,
+      failOnStatusCode: false 
+    }).then((response) => {
+      expect(response.status).to.eq(401);
+      expect(response.body.error).to.include('invalid username or password')
+    });
   })
 
   describe('when a user is logged in', function() {
     beforeEach(function() {
-      cy.request()
+      cy.login({ username: 'ccol69', password: 'thisismypassword' })
     })
 
     it('a new note can be created', function() {
-      cy.contains('New note').click()
-      cy.get('[placeholder="enter note here"]').type('a note created by cypress');
-      cy.contains('save').click()
-      cy.contains('a note created by cypress')
+      cy.createNote({
+        content: 'I am a note created by Cypress',
+        important: true
+      })
+      cy.contains('I am a note created by Cypress')
     })
 
-    describe('and note exists', function() {
+    describe('and notes exists', function() {
       beforeEach(function() {
-        cy.contains('New note').click()
-        cy.get('[placeholder="enter note here"]').type('a note created by cypress');
-        cy.contains('save').click()
-        cy.contains('a note created by cypress')
+        cy.createNote({ content: 'another Cypress note!!!', important: true })
+        cy.createNote({ content: 'AND another Cypress note!!!', important: true })
+        cy.createNote({ content: 'AND AND another Cypress note!!!', important: true })
       })
       
       it('can be made not important', function() {
